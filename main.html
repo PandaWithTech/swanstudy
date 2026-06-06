@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Timer</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
+}
+
+body{
+    height:100vh;
+    overflow:hidden;
+    background:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop') center center/cover no-repeat;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+}
+
+.overlay{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(
+        rgba(0,0,0,0.15),
+        rgba(0,0,0,0.35)
+    );
+    backdrop-filter:blur(2px);
+}
+
+.content{
+    position:relative;
+    z-index:10;
+    text-align:center;
+    color:white;
+    width:90%;
+    max-width:700px;
+    animation:fadeIn 1s ease;
+}
+
+.logo{
+    position:absolute;
+    top:40px;
+    left:50px;
+    font-size:3rem;
+    font-weight:700;
+    letter-spacing:-2px;
+    color:white;
+}
+
+.subtitle{
+    text-transform:uppercase;
+    letter-spacing:4px;
+    font-size:0.85rem;
+    opacity:0.8;
+    margin-bottom:25px;
+}
+
+h1{
+    font-size:4rem;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+.description{
+    opacity:0.85;
+    margin-bottom:45px;
+    font-size:1rem;
+}
+
+.subjects{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:16px;
+}
+
+.subject{
+    min-width:250px;
+    padding:18px 30px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.5);
+    background:rgba(255,255,255,0.08);
+    color:white;
+    font-size:1rem;
+    font-weight:500;
+    cursor:pointer;
+    backdrop-filter:blur(10px);
+    transition:all .3s ease;
+}
+
+.subject:hover{
+    background:white;
+    color:#111;
+    transform:translateY(-3px);
+}
+
+.subject.active{
+    background:white;
+    color:#111;
+    border-color:white;
+}
+
+.continue{
+    margin-top:40px;
+    padding:16px 45px;
+    border:none;
+    border-radius:999px;
+    background:white;
+    color:black;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.continue:hover{
+    transform:scale(1.05);
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@media(max-width:768px){
+
+    .logo{
+        font-size:2rem;
+        left:25px;
+        top:25px;
+    }
+
+    h1{
+        font-size:2.5rem;
+    }
+
+    .subject{
+        min-width:100%;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<div class="logo">swanstudy</div>
+
+<div class="content">
+
+    <div class="subtitle">focus • learn • achieve</div>
+
+    <h1>Choose Your Subject</h1>
+
+    <p class="description">
+        Select a subject to begin your study session.
+    </p>
+
+    <div class="subjects">
+
+        <button class="subject">Accountancy</button>
+
+        <button class="subject">
+            Business Administration
+        </button>
+
+        <button class="subject">Economics</button>
+
+        <button class="subject">Marketing</button>
+
+    </div>
+
+    <button class="continue" onclick="continueToTimer()">
+        Continue
+    </button>
+
+</div>
+
+<script>
+
+let selectedSubject = "";
+
+document.querySelectorAll(".subject").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        document.querySelectorAll(".subject")
+        .forEach(b => b.classList.remove("active"));
+
+        btn.classList.add("active");
+
+        selectedSubject = btn.innerText;
+    });
+
+});
+
+function continueToTimer(){
+
+    if(selectedSubject === ""){
+        alert("Please select a subject first.");
+        return;
+    }
+
+    localStorage.setItem("subject", selectedSubject);
+
+    // Change this later
+    window.location.href = "timer.html";
+}
+
+</script>
+
+</body>
+</html>

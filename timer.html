@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SwanStudy</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
+}
+
+body{
+    height:100vh;
+    overflow:hidden;
+    background:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop') center center/cover;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+}
+
+.overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.25);
+}
+
+.logo{
+    position:absolute;
+    top:40px;
+    left:50px;
+    font-family:'Caveat',cursive;
+    font-size:4rem;
+    color:white;
+    z-index:2;
+}
+
+.container{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    color:white;
+}
+
+.subject{
+    margin-bottom:20px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    opacity:.9;
+    font-size:.9rem;
+}
+
+.modes{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-bottom:30px;
+}
+
+.mode{
+    padding:12px 24px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.5);
+    background:transparent;
+    color:white;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.mode.active{
+    background:white;
+    color:black;
+}
+
+.timer{
+    font-size:9rem;
+    font-weight:700;
+    line-height:1;
+    margin-bottom:40px;
+}
+
+.timer-container{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.edit-time-btn{
+    margin-top:-15px;
+    margin-bottom:30px;
+    padding:12px 24px;
+    border:none;
+    border-radius:999px;
+    background:rgba(255,255,255,.15);
+    color:white;
+    cursor:pointer;
+    backdrop-filter:blur(10px);
+    transition:.3s;
+}
+
+.edit-time-btn:hover{
+    background:rgba(255,255,255,.25);
+}
+
+.status{
+    margin-top:25px;
+    color:white;
+    opacity:.8;
+    letter-spacing:2px;
+    font-size:.85rem;
+}
+
+.controls{
+    display:flex;
+    justify-content:center;
+    gap:15px;
+}
+
+.controls button{
+    padding:15px 35px;
+    border:none;
+    border-radius:999px;
+    background:white;
+    color:black;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.controls button:hover{
+    transform:translateY(-3px);
+}
+
+.modal-backdrop{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    z-index:100;
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-backdrop.open{
+    display:flex;
+}
+
+.modal{
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,.3);
+    border-radius:20px;
+    padding:32px;
+    text-align:center;
+    color:white;
+    min-width:280px;
+}
+
+.modal h3{
+    margin-bottom:8px;
+    font-size:1.1rem;
+    letter-spacing:1px;
+}
+
+.modal p{
+    font-size:.8rem;
+    opacity:.7;
+    margin-bottom:20px;
+    letter-spacing:1px;
+}
+
+.modal input{
+    width:100%;
+    padding:12px 16px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.4);
+    background:rgba(255,255,255,.1);
+    color:white;
+    font-size:1.2rem;
+    text-align:center;
+    outline:none;
+    margin-bottom:16px;
+}
+
+.modal input::placeholder{
+    color:rgba(255,255,255,.4);
+}
+
+.modal-btns{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+}
+
+.modal-btns button{
+    padding:10px 24px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    font-weight:600;
+    transition:.2s;
+}
+
+.modal-btns .btn-confirm{
+    background:white;
+    color:black;
+}
+
+.modal-btns .btn-cancel{
+    background:rgba(255,255,255,.15);
+    color:white;
+    border:1px solid rgba(255,255,255,.3);
+}
+
+.toast{
+    position:fixed;
+    bottom:40px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,.3);
+    border-radius:999px;
+    padding:14px 28px;
+    color:white;
+    font-size:.95rem;
+    letter-spacing:1px;
+    opacity:0;
+    transition:opacity .5s, transform .5s;
+    z-index:200;
+    white-space:nowrap;
+    pointer-events:none;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+
+.congrats-popup{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    z-index:300;
+    justify-content:center;
+    align-items:center;
+}
+
+.congrats-popup.open{
+    display:flex;
+}
+
+.congrats-box{
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(30px);
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:24px;
+    padding:48px 40px;
+    text-align:center;
+    color:white;
+    max-width:360px;
+    animation: popIn .4s cubic-bezier(.175,.885,.32,1.275);
+}
+
+@keyframes popIn{
+    from{ transform:scale(.7); opacity:0; }
+    to{ transform:scale(1); opacity:1; }
+}
+
+.congrats-box .emoji{
+    font-size:3.5rem;
+    margin-bottom:16px;
+}
+
+.congrats-box h2{
+    font-size:1.6rem;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+.congrats-box p{
+    font-size:.95rem;
+    opacity:.85;
+    line-height:1.6;
+    margin-bottom:28px;
+}
+
+.congrats-box button{
+    padding:12px 32px;
+    border-radius:999px;
+    border:none;
+    background:white;
+    color:black;
+    font-weight:600;
+    cursor:pointer;
+    font-size:1rem;
+    transition:.2s;
+}
+
+.congrats-box button:hover{
+    transform:translateY(-2px);
+}
+
+.session-tracker{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.session-dot{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:rgba(255,255,255,.3);
+    border:2px solid rgba(255,255,255,.6);
+    transition:.4s;
+}
+
+.session-dot.active{
+    background:white;
+    border-color:white;
+    box-shadow:0 0 8px rgba(255,255,255,.8);
+}
+
+.session-dot.complete{
+    background:rgba(255,255,255,.7);
+    border-color:white;
+}
+
+.session-label{
+    font-size:.8rem;
+    letter-spacing:2px;
+    opacity:.75;
+    margin-bottom:20px;
+    text-transform:uppercase;
+    color:white;
+}
+
+@media(max-width:768px){
+
+    .timer{
+        font-size:5rem;
+    }
+
+    .controls{
+        flex-wrap:wrap;
+    }
+
+    .logo{
+        font-size:3rem;
+        left:25px;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<div class="logo">swanstudy</div>
+
+<div class="container">
+
+    <div class="subject" id="subjectName">
+        SUBJECT
+    </div>
+
+    <div class="modes">
+        <button class="mode active" onclick="setMode('focus', this)">Focus</button>
+
+<button class="mode" onclick="setMode('short', this)">
+    Short Break
+</button>
+
+<button class="mode" onclick="setMode('long', this)">
+    Long Break
+</button>
+    </div>
+
+   <div class="session-tracker" id="sessionTracker">
+        <span class="session-dot active" id="dot1"></span>
+        <span class="session-dot" id="dot2"></span>
+        <span class="session-dot" id="dot3"></span>
+        <span class="session-dot" id="dot4"></span>
+    </div>
+    <div class="session-label" id="sessionLabel">1 / 4 sessions</div>
+
+   <div class="timer-container">
+
+    <div class="timer" id="timer">
+        25:00
+    </div>
+
+    <button class="edit-time-btn" onclick="editTime()">
+        Customize Session
+    </button>
+
+</div>
+
+   <div class="controls">
+    <button onclick="startTimer()">Start</button>
+    <button onclick="pauseTimer()">Pause</button>
+    <button onclick="resetTimer()">Reset</button>
+</div>
+
+<div class="status" id="status">
+    READY TO FOCUS
+</div>
+
+</div>
+
+<!-- Custom modal -->
+<div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+        <h3 id="modalTitle">CUSTOMIZE SESSION</h3>
+        <p id="modalSub">ENTER DURATION IN MINUTES</p>
+        <input type="number" id="modalInput" min="1" max="180" placeholder="25" />
+        <div class="modal-btns">
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmModal()">Set Time</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<!-- Congrats popup -->
+<div class="congrats-popup" id="congratsPopup">
+    <div class="congrats-box">
+        <div class="emoji">🌟</div>
+        <h2>Good Job!</h2>
+        <p>You did amazing.<br>I'm very proud of you! 💛</p>
+        <button onclick="closeCongratsPopup()">Thank you!</button>
+    </div>
+</div>
+
+<script>
+
+document.getElementById("subjectName").textContent =
+localStorage.getItem("subject") || "Study Session";
+
+let focusTime = 25;
+let shortBreakTime = 5;
+let longBreakTime = 15;
+
+let currentMode = "focus";
+
+let originalTime = focusTime * 60;
+let time = originalTime;
+
+let interval;
+let completedSessions = 0;
+
+const timerDisplay = document.getElementById("timer");
+
+// — Encouragement messages —
+const encouragements = [
+    "You're doing great, keep it up! 💪",
+    "Stay focused, you've got this! 🔥",
+    "Every minute counts — you're crushing it!",
+    "Proud of you for showing up today ✨",
+    "Deep breaths — you're making progress!",
+    "You're building something great, one session at a time 🚀",
+    "Keep pushing — the results will come 🌱",
+    "You're stronger than you think 💫",
+];
+
+let encouragementInterval = null;
+let lastEncouragementIndex = -1;
+let encouragementCount = 0;
+
+function showToast(message, duration = 4000){
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), duration);
+}
+
+function startEncouragements(){
+    encouragementCount = 0;
+    encouragementInterval = setInterval(()=>{
+        if(currentMode !== "focus") return;
+
+        encouragementCount++;
+        const totalFocusSecs = originalTime;
+        const elapsed = totalFocusSecs - time;
+        const remaining = time;
+
+        // Last stretch: when 20% of session left (but at least 30s in)
+        if(remaining <= Math.floor(totalFocusSecs * 0.2) && remaining > 0 && elapsed > 30){
+            showToast("One last stretch for future ghar — you've got this! 🏁");
+            clearInterval(encouragementInterval);
+            return;
+        }
+
+        // Pick a random encouragement (no repeats back to back)
+        let idx;
+        do { idx = Math.floor(Math.random() * encouragements.length); }
+        while(idx === lastEncouragementIndex);
+        lastEncouragementIndex = idx;
+        showToast(encouragements[idx]);
+
+    }, Math.floor(originalTime / 4) * 1000 || 90000); // ~every quarter of session
+}
+
+function stopEncouragements(){
+    clearInterval(encouragementInterval);
+    encouragementInterval = null;
+}
+
+// — Completion sound (Web Audio API, no external files needed) —
+function playCompletionSound(){
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5 E5 G5 C6
+    notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        const start = ctx.currentTime + i * 0.18;
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(0.35, start + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.5);
+        osc.start(start);
+        osc.stop(start + 0.55);
+    });
+}
+
+// — Congrats popup —
+function showCongratsPopup(){
+    document.getElementById("congratsPopup").classList.add("open");
+}
+
+function closeCongratsPopup(){
+    document.getElementById("congratsPopup").classList.remove("open");
+}
+
+function updateSessionTracker(){
+    const dots = document.querySelectorAll(".session-dot");
+    const label = document.getElementById("sessionLabel");
+
+    dots.forEach((dot, i) => {
+        dot.classList.remove("active","complete");
+        if(i < completedSessions) dot.classList.add("complete");
+        else if(i === completedSessions) dot.classList.add("active");
+    });
+
+    const display = completedSessions >= 4 ? 4 : completedSessions + 1;
+    label.textContent = display + " / 4 sessions";
+}
+
+function onSessionComplete(){
+    stopEncouragements();
+    playCompletionSound();
+    completedSessions++;
+
+    if(completedSessions >= 4){
+        completedSessions = 0;
+        updateSessionTracker();
+        showCongratsPopup();
+        setTimeout(()=>{ switchToMode("long"); }, 500);
+    } else {
+        updateSessionTracker();
+        showCongratsPopup();
+        setTimeout(()=>{ switchToMode("short"); }, 500);
+    }
+}
+
+function switchToMode(mode){
+    currentMode = mode;
+
+    document.querySelectorAll(".mode")
+        .forEach(btn => btn.classList.remove("active"));
+
+    const modeMap = { focus: 0, short: 1, long: 2 };
+    document.querySelectorAll(".mode")[modeMap[mode]].classList.add("active");
+
+    if(mode === "focus")       originalTime = focusTime * 60;
+    else if(mode === "short")  originalTime = shortBreakTime * 60;
+    else if(mode === "long")   originalTime = longBreakTime * 60;
+
+    time = originalTime;
+    updateDisplay();
+
+    const statusMap = {
+        focus: "READY TO FOCUS",
+        short: "SHORT BREAK",
+        long:  "LONG BREAK"
+    };
+    document.getElementById("status").textContent = statusMap[mode];
+}
+
+function editTime(){
+    const modeLabel = currentMode === "focus" ? "FOCUS" : currentMode === "short" ? "SHORT BREAK" : "LONG BREAK";
+    const current = currentMode === "focus" ? focusTime : currentMode === "short" ? shortBreakTime : longBreakTime;
+    document.getElementById("modalTitle").textContent = "CUSTOMIZE " + modeLabel;
+    document.getElementById("modalInput").value = current;
+    document.getElementById("modalBackdrop").classList.add("open");
+    document.getElementById("modalInput").focus();
+}
+
+function closeModal(){
+    document.getElementById("modalBackdrop").classList.remove("open");
+}
+
+function confirmModal(){
+    let newTime = parseInt(document.getElementById("modalInput").value);
+
+    if(isNaN(newTime) || newTime < 1){
+        document.getElementById("modalInput").style.borderColor = "rgba(255,100,100,.8)";
+        return;
+    }
+
+    if(currentMode === "focus")       focusTime = newTime;
+    else if(currentMode === "short")  shortBreakTime = newTime;
+    else if(currentMode === "long")   longBreakTime = newTime;
+
+    originalTime = newTime * 60;
+    time = originalTime;
+
+    updateDisplay();
+    closeModal();
+}
+
+// Close modal on backdrop click
+document.getElementById("modalBackdrop").addEventListener("click", function(e){
+    if(e.target === this) closeModal();
+});
+
+// Confirm on Enter key
+document.getElementById("modalInput").addEventListener("keydown", function(e){
+    if(e.key === "Enter") confirmModal();
+});
+
+function updateDisplay(){
+    let minutes = Math.floor(time/60);
+    let seconds = time%60;
+
+    timerDisplay.textContent =
+        String(minutes).padStart(2,'0') + ":" +
+        String(seconds).padStart(2,'0');
+}
+
+function startTimer(){
+    clearInterval(interval);
+    stopEncouragements();
+
+    if(currentMode === "focus"){
+        document.getElementById("status").textContent = "FOCUSING";
+        startEncouragements();
+    } else {
+        document.getElementById("status").textContent = "ON BREAK";
+    }
+
+    interval = setInterval(()=>{
+        if(time > 0){
+            time--;
+            updateDisplay();
+        } else {
+            clearInterval(interval);
+            if(currentMode === "focus"){
+                onSessionComplete();
+            } else {
+                document.getElementById("status").textContent = "BREAK OVER — READY TO FOCUS";
+                switchToMode("focus");
+            }
+        }
+    },1000);
+}
+
+function pauseTimer(){
+    clearInterval(interval);
+    stopEncouragements();
+    document.getElementById("status").textContent = "PAUSED";
+}
+
+function resetTimer(){
+    clearInterval(interval);
+    stopEncouragements();
+    time = originalTime;
+    updateDisplay();
+    document.getElementById("status").textContent = "READY TO FOCUS";
+}
+
+function setMode(mode, button){
+    clearInterval(interval);
+    switchToMode(mode);
+}
+
+updateDisplay();
+updateSessionTracker();
+
+</script>
+
+</body>
+</html>
